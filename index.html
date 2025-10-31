@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport"
+        content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+  <title>WebAR Face — Minimal OK</title>
+  <style>
+    html,body{margin:0;height:100%;background:#000;overflow:hidden}
+    .hint{position:fixed;left:0;right:0;bottom:10px;color:#fff;
+          font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Arial;text-align:center;opacity:.92}
+    .fail{position:fixed;left:0;right:0;top:0;background:#b00020;color:#fff;
+          font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Arial;text-align:center;padding:8px;display:none}
+  </style>
+  <!-- A-Frame (1.3.0 для устойчивости с MindAR) -->
+  <script src="https://cdn.jsdelivr.net/npm/aframe@1.3.0/dist/aframe.min.js"></script>
+  <!-- MindAR (ядро + интеграция с A-Frame) -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.0/dist/mindar-face.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.1.0/dist/mindar-face-aframe.prod.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const fail = document.getElementById('fail');
+      try {
+        if (!AFRAME || !AFRAME.components || !AFRAME.components['mindar-face']) {
+          fail.style.display = 'block';
+          fail.textContent = 'MindAR не загрузился — обнови страницу или проверь интернет.';
+        }
+      } catch(e) {
+        fail.style.display = 'block';
+        fail.textContent = 'Ошибка инициализации: ' + e.message;
+      }
+    });
+  </script>
+</head>
+<body>
+  <div id="fail" class="fail"></div>
+  <div class="hint">Разреши камеру. Держи лицо в кадре — увидишь зелёный квадрат на носу.</div>
+
+  <a-scene
+    mindar-face="autoStart: true; uiLoading: true; uiScanning: false; uiError: true;"
+    embedded color-space="sRGB"
+    renderer="colorManagement: true, physicallyCorrectLights: true"
+    xr-mode-ui="enabled: false">
+
+    <!-- ВАЖНО: для MindAR нужна связка ниже -->
+    <a-camera active="false" position="0 0 0"></a-camera>
+    <a-entity mindar-face-camera></a-entity>
+
+    <!-- Маркер, «приклеенный» к носу -->
+    <a-entity mindar-face-target="anchorIndex: 0">
+      <a-plane color="#00ff88" position="0 0.1 0.02"
+               width="0.15" height="0.15" opacity="0.8"></a-plane>
+    </a-entity>
+  </a-scene>
+</body>
+</html>
